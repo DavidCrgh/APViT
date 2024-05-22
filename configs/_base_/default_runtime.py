@@ -17,4 +17,4 @@ resume_from = None
 
 # use_fp16 = True
 # optimizer_config = dict(use_fp16=use_fp16)
-# fp16 = dict(loss_scale='dynamic')
+fp16 = dict(loss_scale='dynamic')
