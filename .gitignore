@@ -118,6 +118,7 @@ afsout
 weights
 .history
 .DS_Store
+*.code-workspace
 
 # Pytorch
 *.pth
