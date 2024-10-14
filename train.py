@@ -5,6 +5,13 @@ import os.path as osp
 import time
 import random
 
+# Suppress MMCV deprecation warnings
+import warnings
+warnings.filterwarnings(
+    action='ignore', 
+    category=UserWarning, 
+    message='On January 1, 2023, MMCV will release v2.0.0')
+
 import numpy as np
 import mmcv
 import torch
@@ -16,7 +23,6 @@ from mmcls.apis import set_random_seed, train_model
 from mmcls.datasets import build_dataset
 from mmcls.models import build_classifier
 from mmcls.utils import collect_env, get_root_logger
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Train a model')
@@ -59,6 +65,31 @@ def parse_args():
 
     return args
 
+
+def set_num_classes(cfg, num_classes: int):
+    """
+    Propagates the num_classes option to the config dictionary.
+
+    Args:
+        cfg: Config dictionary
+        num_classes: Number of classes to set
+    """
+
+    if cfg is None:
+        raise ValueError('Config dictionary (cfg) cannot be None.')
+
+    if isinstance(num_classes, str):
+        num_classes = int(num_classes)
+    elif not isinstance(num_classes, int):
+        raise ValueError(f'Parameter num_classes must be an integer, got {type(num_classes)}.')
+
+    cfg.num_classes = num_classes
+    cfg.data.train.dataset.num_classes = num_classes
+    cfg.data.val.num_classes = num_classes
+    cfg.data.test.num_classes = num_classes
+    cfg.model.head.num_classes = num_classes
+
+
 def main():
     args = parse_args()
     print(args)
@@ -66,6 +97,9 @@ def main():
     cfg = Config.fromfile(args.config)
     if args.options is not None:
         cfg.merge_from_dict(args.options)
+        if 'num_classes' in args.options:
+            print(f'Overriding num_classes with {args.options["num_classes"]}')
+            set_num_classes(cfg, args.options['num_classes'])
     # set cudnn_benchmark
     if cfg.get('cudnn_benchmark', False):
         torch.backends.cudnn.benchmark = True
@@ -158,3 +192,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    print('Exiting train.py script.')

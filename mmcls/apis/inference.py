@@ -44,7 +44,7 @@ def init_model(config, checkpoint=None, device='cuda:0', options=None):
                 model.CLASSES = checkpoint['meta']['CLASSES']
                 class_loaded = True
         if not class_loaded:
-            from mmcls.datasets.raf import FER_CLASSES
+            from mmcls.datasets.fertools import FER_CLASSES
             model.CLASSES = FER_CLASSES
     model.cfg = config  # save the config in the model for convenience
     model.to(device)

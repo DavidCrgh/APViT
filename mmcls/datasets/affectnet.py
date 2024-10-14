@@ -1,10 +1,4 @@
-import os
-import random
-from typing import Any, Dict
-
 import numpy as np
-from mmcls.models.losses import accuracy, f1_score, precision, recall
-from mmcls.models.losses.eval_metrics import class_accuracy
 
 from .base_dataset import BaseDataset
 from .builder import DATASETS
@@ -13,25 +7,42 @@ from .fertools import FER_CLASSES, find_folders, get_samples, convert2coarse_lab
 
 
 @DATASETS.register_module()
-class RAF(BaseDataset):
+class AffectNet(BaseDataset):
 
     IMG_EXTENSIONS = ('.jpg', '.jpeg', '.png', '.ppm', '.bmp', '.pgm', '.tif')
     DATASET_CLASSES = [
-        'Surprise',
-        'Fear',
-        'Disgust',
-        'Happiness',
-        'Sadness',
-        'Anger',
-        'Neutral'
+        'Neutral',  # 0
+        'Happy',    # 1
+        'Sad',      # 2
+        'Surprise', # 3
+        'Fear',     # 4
+        'Disgust',  # 5
+        'Anger',    # 6
+        'Contempt'  # 7
     ]
-    CLASSES = FER_CLASSES[:7]
+
+    def __init__(self, data_prefix, pipeline, classes=None, ann_file=None, test_mode=False, num_classes=7):
+        self.num_classes = num_classes
+
+        if not classes:
+            self.CLASSES = FER_CLASSES[:num_classes]
+        else:
+            self.CLASSES = classes
+
+        super().__init__(
+            data_prefix=data_prefix,
+            pipeline=pipeline,
+            classes=self.CLASSES,
+            ann_file=ann_file,
+            test_mode=test_mode
+        )
+
 
     @staticmethod
-    def convert_gt_label(i:int):
+    def convert_gt_label(i:int, num_classes=7):
         """# dataset -> FER_CLASSES"""
-        convert_table = (5, 2, 1, 4, 3, 0, 6)
-        assert sum(convert_table) == sum([i for i in range(7)])
+        convert_table = (6, 5, 4, 2, 1, 3, 0, 7)
+        assert sum(convert_table[:num_classes]) == sum([i for i in range(num_classes)])
         return convert_table[i]
 
     def load_annotations(self):
@@ -51,7 +62,6 @@ class RAF(BaseDataset):
         elif isinstance(self.ann_file, str):
             with open(self.ann_file) as f:
                 samples = [x.strip().split(' ') for x in f.readlines()]
-            samples = [[i[0].replace('_aligned', ''), i[1]] for i in samples]
         else:
             raise TypeError('ann_file must be a str or None')
         self.samples = samples
@@ -60,11 +70,10 @@ class RAF(BaseDataset):
         for filename, gt_label in self.samples:
             info = {'img_prefix': self.data_prefix}
             info['img_info'] = {'filename': filename}
-            gt_label = int(gt_label) - 1
-            gt_label = self.convert_gt_label(gt_label)
+            gt_label = int(gt_label) # - 1 AffectNet class indices are 0-based
+            gt_label = self.convert_gt_label(gt_label, self.num_classes)
             coarse_label = convert2coarse_label(gt_label)
             info['gt_label'] = np.array(gt_label, dtype=np.int64)
             info['coarse_label'] = np.array(coarse_label, dtype=np.int64)
             data_infos.append(info)
         return data_infos
-
