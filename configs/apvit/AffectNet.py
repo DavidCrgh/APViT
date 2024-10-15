@@ -54,7 +54,7 @@ paramwise_cfg = dict(custom_keys={
                 '.vit.cls_pos_embed': dict(decay_mult=0.),
                 '.vit.cls_token': dict(decay_mult=0.),
                 })
-optimizer = dict(type='SGD', lr=1e-3, momentum=0.9, weight_decay=5e-4, paramwise_cfg=paramwise_cfg)
+optimizer = dict(type='SGD', lr=5e-4, momentum=0.9, weight_decay=5e-4, paramwise_cfg=paramwise_cfg)
 
 optimizer_config = dict(grad_clip=dict(max_norm=10.0, norm_type=2))
 
