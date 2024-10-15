@@ -12,6 +12,10 @@ warnings.filterwarnings(
     category=UserWarning, 
     message='On January 1, 2023, MMCV will release v2.0.0')
 
+# Suppress Albumentations update warnings if running in Kaggle
+if os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
+    os.environ['NO_ALBUMENTATIONS_UPDATE'] = '1'
+
 import numpy as np
 import mmcv
 import torch
