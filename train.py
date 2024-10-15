@@ -63,6 +63,10 @@ def parse_args():
         default='none',
         help='job launcher')
     parser.add_argument('--local_rank', type=int, default=0)
+    parser.add_argument(
+        '--use_fp16', 
+        action='store_true', 
+        help='Train using half-precision floating point')
     args = parser.parse_args()
     if 'LOCAL_RANK' not in os.environ:
         os.environ['LOCAL_RANK'] = str(args.local_rank)
@@ -131,6 +135,10 @@ def main():
         init_dist(args.launcher, **cfg.dist_params)
         _, world_size = get_dist_info()
         cfg.gpu_ids = range(world_size)
+
+    # Set FP16 training
+    if args.use_fp16:
+        cfg['fp16'] = dict(loss_scale='dynamic')
 
     # create work_dir
     mmcv.mkdir_or_exist(osp.abspath(cfg.work_dir))
