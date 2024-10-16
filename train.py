@@ -12,8 +12,8 @@ warnings.filterwarnings(
     category=UserWarning, 
     message='On January 1, 2023, MMCV will release v2.0.0')
 
-# Suppress Albumentations update warnings if running in Kaggle
-if os.environ.get('KAGGLE_KERNEL_RUN_TYPE', ''):
+# Suppress Albumentations update warnings if running in online env
+if os.environ.get('KAGGLE_KERNEL_RUN_TYPE', '') or os.environ.get('COLAB_GPU', ''):
     os.environ['NO_ALBUMENTATIONS_UPDATE'] = '1'
 
 import numpy as np
