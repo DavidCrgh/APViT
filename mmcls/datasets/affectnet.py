@@ -40,8 +40,8 @@ class AffectNet(BaseDataset):
 
     @staticmethod
     def convert_gt_label(i:int, num_classes=7):
-        """# dataset -> FER_CLASSES"""
-        convert_table = (6, 5, 4, 2, 1, 3, 0, 7)
+        # DATASET_CLASSES -> FER_CLASSES
+        convert_table = (6, 4, 3, 5, 2, 1, 0, 7)
         assert sum(convert_table[:num_classes]) == sum([i for i in range(num_classes)])
         return convert_table[i]
 
