@@ -147,16 +147,10 @@ def main():
     log_file = osp.join(cfg.work_dir, f'{timestamp}.log')
     logger = get_root_logger(log_file=log_file, log_level=cfg.log_level)
 
-    # init the meta dict to record some important information such as
+    # Init the meta dict to record some important information such as
     # environment info and seed, which will be logged
-    
-    # TODO: when resume_from arg is passed, the metadata dict should be loaded
-    # from the checkpoint. We can load the checkpoint without inducing changes
-    # to the state of the model, runner, optimizer, etc. by calling the 
-    # load_checkpoint class method found in:
-    # https://mmcv.readthedocs.io/en/v1.7.0/api.html#mmcv.runner.CheckpointLoader.load_checkpoint
-    # meta = dict()
-
+    # If resume_from is passed, the metadata will be loaded from the 
+    # checkpoint
     if args.resume_from:
         checkpoint = CheckpointLoader.load_checkpoint(
             args.resume_from, 
