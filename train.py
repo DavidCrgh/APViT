@@ -20,7 +20,7 @@ import numpy as np
 import mmcv
 import torch
 from mmcv import Config, DictAction
-from mmcv.runner import get_dist_info, init_dist
+from mmcv.runner import get_dist_info, init_dist, CheckpointLoader
 
 from mmcls import __version__
 from mmcls.apis import set_random_seed, train_model
@@ -149,7 +149,30 @@ def main():
 
     # init the meta dict to record some important information such as
     # environment info and seed, which will be logged
-    meta = dict()
+    
+    # TODO: when resume_from arg is passed, the metadata dict should be loaded
+    # from the checkpoint. We can load the checkpoint without inducing changes
+    # to the state of the model, runner, optimizer, etc. by calling the 
+    # load_checkpoint class method found in:
+    # https://mmcv.readthedocs.io/en/v1.7.0/api.html#mmcv.runner.CheckpointLoader.load_checkpoint
+    # meta = dict()
+
+    if args.resume_from:
+        checkpoint = CheckpointLoader.load_checkpoint(
+            args.resume_from, 
+            map_location='cpu',
+            logger=logger)
+        
+        if checkpoint and 'meta' in checkpoint:
+            meta = copy.deepcopy(checkpoint['meta'])
+        else:
+            warnings.warn('No metadata found in the checkpoint. Creating an empty one.')
+            meta = dict()
+
+        del checkpoint
+    else:
+        meta = dict()
+
     # log env info
     env_info_dict = collect_env()
     env_info = '\n'.join([(f'{k}: {v}') for k, v in env_info_dict.items()])
