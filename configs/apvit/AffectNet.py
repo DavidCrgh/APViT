@@ -1,6 +1,6 @@
 _base_ = [
     '../_base_/default_runtime.py',
-    f'../_base_/datasets/AffectNet.py',
+    f'../_base_/datasets/AffectNet-kaggle.py',
 ]
 
 
