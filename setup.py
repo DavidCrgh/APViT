@@ -3,8 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='mmcls',
     version='0.1.0',
-    packages=['mmcls'],
-    package_dir={'mmcls': '.'},
+    packages=find_packages(),
     install_requires=[
         'mmcv',
     ],
